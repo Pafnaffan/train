@@ -1,0 +1,197 @@
+#!r7rs
+
+(import (scheme base) (scheme inexact) (scheme write))
+
+(define (writeln/return x)
+  (write x)
+  (newline)
+  x)
+
+;;;  Exemples de départ.
+
+(define (derive-wrt f1 h)
+  (lambda (x) (/ (- (f1 (+ x h)) (f1 x)) h)))
+
+(writeln/return ((derive-wrt sin 0.00001) 0.0))
+(writeln/return ((derive-wrt square 0.00001) 3.0))
+(writeln/return ((derive-wrt + 0.00001) 4.0))
+
+(define (right-reduce f2 l init-value)
+  (if (null? l) init-value (f2 (car l) (right-reduce f2 (cdr l) init-value))))
+
+(writeln/return (right-reduce - '(26 1 2026 2027) 2028))
+
+(define (left-reduce f2 l init-value)
+  (if (null? l) init-value (left-reduce f2 (cdr l) (f2 init-value (car l)))))
+
+(writeln/return (left-reduce - '(26 1 2026 2027) 2028))
+
+(define (fact n)
+  (if (negative? n)
+      #f
+      (let tr-fact ((counter n)
+                    (accumulator 1))
+        ;;  "-tr" est mis pour "tail-recursive".
+        (if (null? counter)
+            accumulator
+            (tr-fact (- counter 1) (* accumulator counter))))))
+
+;;;  Clôture lexicale.
+
+(define (crash)
+  (/ 1 0))
+
+(writeln/return (let ((n 2025))
+                  (let ((f1 (lambda (x) (+ x n))))
+                    (let ((n 2026))
+                      (f1 0)))))
+
+(writeln/return (let ((n 2026))
+                  (let ((f1 (lambda (x)
+                              (set! n (+ n 1))
+                              (cons '*f1* (cons x n)))))
+                    (let ((n 0))
+                      (let ((result (f1 0)))
+                        (cons n result))))))
+
+(define mystery
+  (let ((x #f))
+    (lambda (y)
+      (let ((result x))
+        (set! x y)
+        result))))
+
+(writeln/return (let ((x 2023))
+                  (mystery 2024)))
+
+(writeln/return (let ((x 2025))
+                  (mystery 2026)))
+
+;;;  Tests de listes circulaires.
+
+(define (last-pair p)
+  (let ((p0 (cdr p)))
+    (if (pair? p0) (last-pair p0) p)))
+
+(define l0
+  (let ((l '(0 1 2 3)))
+    (set-cdr! (last-pair l) l)  ;  Rebouclage par effet de bord.
+    l))  ;  Valeur finale de la variable "l0".
+
+(define l1
+  (let ((l '(1 2 3)))
+    (set-cdr! (last-pair l) l)  ;  Rebouclage.
+    (cons 0 l)))  ;  Résultat.
+
+(define (list?-v2-0 x)
+  (or (null? x) (and (pair? x) (list?-v2-0 (cdr x)))))
+
+(define (circular-list? l)
+  (let loop ((slow l)
+             (fast l)
+             (after-beginning? #f))
+    (cond ((null? fast) #f)
+          ((and after-beginning? (eq? fast slow)) #t)
+          (else (let ((next (cdr fast)))
+                  (if (null? next) #f (loop (cdr slow) (cdr next) #t)))))))
+
+(define (add_incrementaly l)
+  (let thru ((l0 l)
+             (to-be-added 1))
+    (if (null? l0) l0
+        (cons (+ (car l0) to-be-added)
+              (thru (cdr l0) (+ to-be-added 1))))))
+
+(writeln/return (add_incrementaly '(26 1 2026)))
+
+(define (find p1? l)
+  (if (null? l)
+      #f
+      (let ((first (car l)))
+        (if (p1? first) first (find p1? (cdr l))))))
+
+(writeln/return (find not '()))
+
+(define (find-all-in-order p1? l)
+  (if (null? l) '()
+      (let ((first (car l))
+            (more (find-all-in-order p1? (cdr l))))
+        (if (p1? first) (cons first more) more))))
+
+(find-all-in-order even? '(27 1 2026 2027 2028))
+(find-all-in-order even? '(27 1 2027))
+
+(define (find-all p1? l)
+  (let thru ((l0 l)
+             (accumulator '()))
+    (if (null? l0) accumulator
+        (thru (cdr l0)
+              (let ((first (car l0)))
+                (if (p1? first) (cons first accumulator)
+                    accumulator))))))
+
+(find-all even? '(27 1 2026 2027 2028))
+(find-all even? '(27 1 2027))
+
+(define (find-last p1? l)
+  (let thru ((l0 l)
+             (presumed-answer #f))
+    (if (null? l0) presumed-answer
+        (thru (cdr l0)
+              (let ((first (car l0)))
+                (if (p1? first) first presumed-answer))))))
+
+(find-last even? '(27 1 2026 2027 2028))
+(find-last even? '(27 1 2027))
+
+(define (find-unique p1? l)
+  (let thru ((l0 l)
+             (presumed-answer #f))
+    (if (null? l0) presumed-answer
+        (let ((first (car l0)))
+          (if (p1? first)
+              (if presumed-answer #f (thru (cdr l0) (list first)))
+              (thru (cdr l0) presumed-answer))))))
+
+(find-unique even? '(27 1 2026 2027 2028))
+(find-unique even? '(27 1 2027))
+(find-unique even? '(27 2 2027))
+
+(define (reverse-by-2/end l)
+  (if (or (null? l) (null? (cdr l))) '()
+      (cons (cadr l) (cons(car l) (reverse-by-2/end (cddr l))))))
+
+(writeln/return (reverse-by-2/end '(God Emperor of Dune)))
+
+(define (reverse-by-2/last l)
+  (if (null? l) '()
+      (if (null? (cdr l)) (list (car l))
+          (cons (cadr l) (cons (car l) (reverse-by-2/last (cddr l)))))))
+
+(define example '(Messiah of Dune))
+
+(define (list-rd? x)
+  (let loop ((slow x)
+             (fast x)
+             (after-beginning? #f))
+    (cond ((null? fast) #t)
+          ((and after-beginning? (eq? fast slow)) #f)
+          ((pair? fast)
+           (let ((next (cdr fast)))
+             (cond ((null? next) #t)
+                   ((pair? next) (loop (cdr slow) (cdr next) #t))
+                   (else #f))))
+          (else #f))))
+
+(define (list-length? x)
+  (let loop ((slow x)
+             (fast x)
+             (accumulator 0))
+    (cond ((null? fast) accumulator)
+          ((and (positive? accumulator) (eq? fast slow)) #f)
+          ((pair? fast)
+           (let ((next (cdr fast)))
+             (cond ((null? next) (+ accumulator 1))
+                   ((pair? next) (loop (cdr slow) (cdr next) (+ accumulator 2)))
+                   (else #f))))
+          (else #f))))
