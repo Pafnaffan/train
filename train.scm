@@ -2,19 +2,19 @@
 
 (import (scheme base) (scheme inexact) (scheme write))
 
-;;; ============================================================
-;;;  Projet de fin de semestre no1 — Programmation Avancée
+;;; --------------------------------------------
+;;;  Projet de Programmation Avancée
 ;;;  Simulateur de mini-réseau ferroviaire
-;;; ============================================================
- 
- 
-;;; ------------------------------------------------------------
-;;; PARTIE 1 : Structure tlist (file FIFO)
-;;; Exercice 1.38 du cours — file gérée par deux listes :
-;;;   - `front` : éléments à retirer (tête de file)
-;;;   - `back`  : éléments ajoutés (queue de file, en ordre inverse)
-;;; ------------------------------------------------------------
- 
+;;;  Pierre-Alexandre Rusthul - Samuel Bertrand
+;;; --------------------------------------------
+
+
+;;; ----------------------------------------------------------------
+;;; Structure tlist (file FIFO)
+;;;   - front : éléments à retirer (tête de file)
+;;;   - back  : éléments ajoutés (queue de file, en ordre inverse)
+;;; -----------------------------------------------------------------
+
 (define (make-tlist)
   (let ((front '())
         (back  '()))
@@ -58,7 +58,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 2 : Compteur circulaire (make-top)
+;;; Compteur circulaire (make-top)
 ;;; Fourni dans l'énoncé — compte de 0 à n-1 en boucle.
 ;;; ------------------------------------------------------------
  
@@ -78,7 +78,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 3 : make-train — création d'un train
+;;; make-train — création d'un train
 ;;;
 ;;; Un train encapsule :
 ;;;   - son nom
@@ -128,7 +128,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 4 : make-station — la gare centrale
+;;; make-station — la gare centrale
 ;;;
 ;;; La gare gère une file FIFO de trains en attente.
 ;;; Au départ, tous les trains fournis sont dans la file.
@@ -174,7 +174,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 5 : snapshot — capture de l'état courant
+;;; snapshot — capture de l'état courant
 ;;;
 ;;; Retourne une liste de la forme :
 ;;;   ((nom1 nom2 ...) pos1 pos2 pos3 ...)
@@ -191,7 +191,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 6 : step! — un pas de simulation
+;;; step! — un pas de simulation
 ;;;
 ;;; Règles (appliquées simultanément, dans l'ordre décrit) :
 ;;;
@@ -221,7 +221,7 @@
  
  
 ;;; ------------------------------------------------------------
-;;; PARTIE 7 : trains — fonction principale
+;;; trains — fonction principale
 ;;;
 ;;; Construit la simulation sur `steps` pas.
 ;;; Retourne une liste de snapshots (longueur = steps + 1,
@@ -247,16 +247,10 @@
                   (cons (snapshot station train-list) acc)))))))
  
  
-;;; ============================================================
-;;; EXEMPLE D'UTILISATION (conforme à la figure 2 de l'énoncé)
-;;; ============================================================
- 
-(define train-1 (make-train 'train-1 10))
-(define train-2 (make-train 'train-2 14))
-(define train-3 (make-train 'train-3 18))
- 
-(define example (trains (list train-1 train-2 train-3) 35))
- 
+;;; --------
+;;; Exemples
+;;; --------
+  
 ;;; Affichage lisible de chaque état
 (define (display-simulation result)
   (let loop ((states result) (step 0))
@@ -267,7 +261,21 @@
       (display (car states))
       (newline)
       (loop (cdr states) (+ step 1)))))
- 
-(display "=== Simulation du réseau ferroviaire ===")
+
+(define example1 (trains (list (make-train 'train-1 10) (make-train 'train-2 14) (make-train 'train-3 18)) 35))
+
+(define example2 (trains (list (make-train 'train-1 5) (make-train 'train-2 5) (make-train 'train-3 5)) 35))
+
+(define example3 (trains (list (make-train 'train-1 10) (make-train 'train-2 9) (make-train 'train-3 8)) 35))
+
+(display "=== Simulation 1 du réseau ferroviaire ===")
 (newline)
-(display-simulation example)
+(display-simulation example1)
+(newline)
+(display "=== Simulation 2 du réseau ferroviaire ===")
+(newline)
+(display-simulation example2)
+(display "=== Simulation 3 du réseau ferroviaire ===")
+(newline)
+(display-simulation example3)
+
