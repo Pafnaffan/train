@@ -264,9 +264,10 @@
 
 (define example1 (trains (list (make-train 'train-1 10) (make-train 'train-2 14) (make-train 'train-3 18)) 35))
 
-(define example2 (trains (list (make-train 'train-1 5) (make-train 'train-2 5) (make-train 'train-3 5)) 35))
+(define example2 (trains (list (make-train 'train-1 10) (make-train 'train-2 9) (make-train 'train-3 8)) 35))
 
-(define example3 (trains (list (make-train 'train-1 10) (make-train 'train-2 9) (make-train 'train-3 8)) 35))
+(define example3 (trains (list (make-train 'train-1 10) (make-train 'train-2 8) (make-train 'train-3 6) (make-train 'train-4 4) (make-train 'train-5 2)) 35))
+
 
 (display "=== Simulation 1 du réseau ferroviaire ===")
 (newline)
@@ -275,7 +276,7 @@
 (display "=== Simulation 2 du réseau ferroviaire ===")
 (newline)
 (display-simulation example2)
+(newline)
 (display "=== Simulation 3 du réseau ferroviaire ===")
 (newline)
 (display-simulation example3)
-
