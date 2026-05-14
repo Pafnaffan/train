@@ -52,9 +52,7 @@
                #f
                (let ((val (car front)))
                  (set! front (cdr front))
-                 val))))
- 
-        (else (error "tlist: message inconnu" msg))))))
+                 val))))))))
  
  
 ;;; ------------------------------------------------------------
@@ -73,8 +71,7 @@
         ((eq? msg 'incr)
          (lambda ()
            (set! i (modulo (+ i 1) n))
-           i))
-        (else (error "make-top: message inconnu" msg))))))
+           i))))))
  
  
 ;;; ------------------------------------------------------------
@@ -122,9 +119,7 @@
         ;; Avancer d'une borne et retourner la valeur
         ((eq? msg 'incr)
          (lambda ()
-           ((top 'incr))))
- 
-        (else (error "make-train: message inconnu" msg))))))
+           ((top 'incr))))))))
  
  
 ;;; ------------------------------------------------------------
@@ -168,9 +163,7 @@
         ;; Teste si la file est vide
         ((eq? msg 'empty?)
          (lambda ()
-           ((queue 'empty?))))
- 
-        (else (error "make-station: message inconnu" msg))))))
+           ((queue 'empty?))))))))
  
  
 ;;; ------------------------------------------------------------
